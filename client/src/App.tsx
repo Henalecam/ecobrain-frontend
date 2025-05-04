@@ -12,6 +12,7 @@ import BudgetPage from "@/pages/budget-page";
 import ReportsPage from "@/pages/reports-page";
 import GoalsPage from "@/pages/goals-page";
 import InvestmentsPage from "@/pages/investments-page";
+import InsightsPage from "@/pages/insights-page";
 import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
 
@@ -24,6 +25,7 @@ function Router() {
       <ProtectedRoute path="/reports" component={ReportsPage} />
       <ProtectedRoute path="/goals" component={GoalsPage} />
       <ProtectedRoute path="/investments" component={InvestmentsPage} />
+      <ProtectedRoute path="/insights" component={InsightsPage} />
       <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>

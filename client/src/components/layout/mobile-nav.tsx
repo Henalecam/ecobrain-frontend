@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, ReceiptText, BarChart, User, Plus } from "lucide-react";
+import { LayoutDashboard, ReceiptText, BarChart, User, Plus, Lightbulb } from "lucide-react";
 
 export function MobileNav() {
   const [location] = useLocation();
@@ -8,8 +8,8 @@ export function MobileNav() {
   const navItems = [
     { href: "/", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
     { href: "/transactions", label: "Transações", icon: <ReceiptText className="h-5 w-5" /> },
+    { href: "/insights", label: "Insights", icon: <Lightbulb className="h-5 w-5" /> },
     { href: "/reports", label: "Relatórios", icon: <BarChart className="h-5 w-5" /> },
-    { href: "/profile", label: "Perfil", icon: <User className="h-5 w-5" /> },
   ];
 
   return (

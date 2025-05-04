@@ -10,17 +10,24 @@ import {
   TrendingUp,
   Settings,
   Leaf,
+  Lightbulb,
+  LogOut,
 } from "lucide-react";
 
 export function Sidebar() {
   const [location] = useLocation();
-  const { user } = useAuth();
+  const { user, logoutMutation } = useAuth();
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   const navItems = [
     { href: "/", label: "Dashboard", icon: <LayoutDashboard className="mr-3 h-5 w-5" /> },
     { href: "/transactions", label: "Transações", icon: <ReceiptText className="mr-3 h-5 w-5" /> },
     { href: "/budget", label: "Orçamento", icon: <Wallet className="mr-3 h-5 w-5" /> },
     { href: "/reports", label: "Relatórios", icon: <BarChart className="mr-3 h-5 w-5" /> },
+    { href: "/insights", label: "Insights", icon: <Lightbulb className="mr-3 h-5 w-5" /> },
     { href: "/goals", label: "Metas", icon: <Award className="mr-3 h-5 w-5" /> },
     { href: "/investments", label: "Investimentos", icon: <TrendingUp className="mr-3 h-5 w-5" /> },
   ];
@@ -63,9 +70,18 @@ export function Sidebar() {
             <p className="text-sm font-medium truncate">{user?.firstName} {user?.lastName || ''}</p>
             <p className="text-xs text-muted-foreground truncate">{user?.email || user?.username}</p>
           </div>
-          <button className="ml-auto text-muted-foreground hover:text-foreground transition-colors">
-            <Settings className="h-5 w-5" />
-          </button>
+          <div className="ml-auto flex items-center gap-2">
+            <button className="text-muted-foreground hover:text-foreground transition-colors">
+              <Settings className="h-5 w-5" />
+            </button>
+            <button 
+              onClick={handleLogout}
+              className="text-muted-foreground hover:text-destructive transition-colors" 
+              title="Sair"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </div>
     </aside>
