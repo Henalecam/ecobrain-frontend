@@ -239,8 +239,7 @@ export default function BudgetPage() {
                     </div>
                     <Progress 
                       value={percentage > 100 ? 100 : percentage} 
-                      className="h-2" 
-                      indicatorClassName={getColorClass(percentage)}
+                      className={`h-2 [&>div]:${getColorClass(percentage)}`}
                     />
                   </div>
                 );
