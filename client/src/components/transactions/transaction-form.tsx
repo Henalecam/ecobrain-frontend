@@ -71,7 +71,7 @@ export function TransactionForm({ open, onOpenChange }: TransactionFormProps) {
   const { toast } = useToast();
   const [isRecurring, setIsRecurring] = useState(false);
 
-  const { data: categories } = useQuery({
+  const { data: categories = [] } = useQuery<any[]>({
     queryKey: ['/api/categories'],
     enabled: open,
   });
@@ -198,18 +198,18 @@ export function TransactionForm({ open, onOpenChange }: TransactionFormProps) {
                   <FormLabel>Categoria</FormLabel>
                   <FormControl>
                     <Select
-                      value={field.value}
-                      onValueChange={field.onChange}
+                      value={field.value?.toString() || ""}
+                      onValueChange={(value) => field.onChange(Number(value))}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione uma categoria" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories?.map((category: any) => (
+                        {Array.isArray(categories) && categories.length > 0 ? categories.map((category: any) => (
                           <SelectItem key={category.id} value={category.id.toString()}>
                             {category.name}
                           </SelectItem>
-                        )) || (
+                        )) : (
                           <>
                             <SelectItem value="1">Alimentação</SelectItem>
                             <SelectItem value="2">Moradia</SelectItem>
