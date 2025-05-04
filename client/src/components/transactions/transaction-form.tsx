@@ -46,7 +46,7 @@ const transactionFormSchema = z.object({
   description: z.string().min(2, "A descrição é obrigatória"),
   amount: z.coerce.number().min(0.01, "O valor deve ser maior que zero"),
   type: z.enum(["income", "expense"]),
-  categoryId: z.string().min(1, "Selecione uma categoria"),
+  categoryId: z.coerce.number().min(1, "Selecione uma categoria"),
   date: z.date(),
   notes: z.string().optional(),
 });
@@ -57,7 +57,7 @@ const defaultValues: Partial<TransactionFormValues> = {
   description: "",
   amount: undefined,
   type: "expense",
-  categoryId: "",
+  categoryId: undefined,
   date: new Date(),
   notes: "",
 };
