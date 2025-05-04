@@ -220,27 +220,27 @@ export default function InvestmentsPage() {
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="list">Lista de Investimentos</TabsTrigger>
           </TabsList>
-        </Tabs>
-        
-        <TabsContent value="overview" className="mt-0">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-[120px] w-full rounded-xl" />
-            ))}
-          </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Skeleton className="h-[400px] w-full rounded-xl" />
-            <Skeleton className="h-[400px] w-full rounded-xl" />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="list" className="mt-0">
-          <div className="flex justify-end mb-4">
-            <Skeleton className="h-10 w-40" />
-          </div>
-          <Skeleton className="h-[500px] w-full rounded-xl" />
-        </TabsContent>
+          <TabsContent value="overview" className="mt-0">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-[120px] w-full rounded-xl" />
+              ))}
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Skeleton className="h-[400px] w-full rounded-xl" />
+              <Skeleton className="h-[400px] w-full rounded-xl" />
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="list" className="mt-0">
+            <div className="flex justify-end mb-4">
+              <Skeleton className="h-10 w-40" />
+            </div>
+            <Skeleton className="h-[500px] w-full rounded-xl" />
+          </TabsContent>
+        </Tabs>
       </AppLayout>
     );
   }
@@ -258,10 +258,9 @@ export default function InvestmentsPage() {
             Lista de Investimentos
           </TabsTrigger>
         </TabsList>
-      </Tabs>
-
-      <TabsContent value="overview" className="mt-0">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        
+        <TabsContent value="overview" className="mt-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-xl flex items-center">
@@ -396,60 +395,61 @@ export default function InvestmentsPage() {
           </Card>
         </div>
       </TabsContent>
-      
-      <TabsContent value="list" className="mt-0">
-        <div className="flex justify-end mb-4">
-          <Button onClick={() => setShowInvestmentForm(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Novo Investimento
-          </Button>
-        </div>
         
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead className="hidden md:table-cell">Instituição</TableHead>
-                  <TableHead className="hidden md:table-cell">Data Inicial</TableHead>
-                  <TableHead className="text-right">Valor Atual</TableHead>
-                  <TableHead className="text-right">Retorno</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {investments.map((investment) => {
-                  const typeLabel = investmentTypes.find(t => t.id === investment.type)?.name || investment.type;
-                  const isPositiveReturn = investment.returnRate >= 0;
-                  
-                  return (
-                    <TableRow key={investment.id}>
-                      <TableCell className="font-medium">{investment.name}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{typeLabel}</Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">{investment.institution}</TableCell>
-                      <TableCell className="hidden md:table-cell">{investment.initialDate}</TableCell>
-                      <TableCell className="text-right font-mono">{formatCurrency(investment.value)}</TableCell>
-                      <TableCell className={`text-right font-mono ${isPositiveReturn ? 'text-primary' : 'text-destructive'}`}>
-                        <div className="flex items-center justify-end">
-                          {isPositiveReturn ? (
-                            <ArrowUp className="h-3 w-3 mr-1" />
-                          ) : (
-                            <ArrowDown className="h-3 w-3 mr-1" />
-                          )}
-                          {formatPercent(investment.returnRate)}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </TabsContent>
+        <TabsContent value="list" className="mt-0">
+          <div className="flex justify-end mb-4">
+            <Button onClick={() => setShowInvestmentForm(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Investimento
+            </Button>
+          </div>
+        
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead className="hidden md:table-cell">Instituição</TableHead>
+                    <TableHead className="hidden md:table-cell">Data Inicial</TableHead>
+                    <TableHead className="text-right">Valor Atual</TableHead>
+                    <TableHead className="text-right">Retorno</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {investments.map((investment) => {
+                    const typeLabel = investmentTypes.find(t => t.id === investment.type)?.name || investment.type;
+                    const isPositiveReturn = investment.returnRate >= 0;
+                    
+                    return (
+                      <TableRow key={investment.id}>
+                        <TableCell className="font-medium">{investment.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{typeLabel}</Badge>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">{investment.institution}</TableCell>
+                        <TableCell className="hidden md:table-cell">{investment.initialDate}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(investment.value)}</TableCell>
+                        <TableCell className={`text-right font-mono ${isPositiveReturn ? 'text-primary' : 'text-destructive'}`}>
+                          <div className="flex items-center justify-end">
+                            {isPositiveReturn ? (
+                              <ArrowUp className="h-3 w-3 mr-1" />
+                            ) : (
+                              <ArrowDown className="h-3 w-3 mr-1" />
+                            )}
+                            {formatPercent(investment.returnRate)}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Investment Form Dialog */}
       <Dialog open={showInvestmentForm} onOpenChange={setShowInvestmentForm}>

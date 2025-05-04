@@ -209,45 +209,43 @@ export default function BudgetPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <TabsContent value={activeTab} className="mt-0">
-              <div className="space-y-8">
-                {budget.categories.map((category) => {
-                  const percentage = Math.round((category.spent / category.budget) * 100);
-                  
-                  return (
-                    <div key={category.id}>
-                      <div className="flex justify-between items-center mb-2">
-                        <div className="flex items-center">
-                          <div className={`p-1.5 rounded-full mr-2 ${
-                            percentage > 100 
-                              ? 'bg-destructive/10 text-destructive' 
-                              : percentage > 80 
-                                ? 'bg-secondary/10 text-secondary' 
-                                : 'bg-primary/10 text-primary'
-                          }`}>
-                            {getCategoryIcon(category.name)}
-                          </div>
-                          <div>
-                            <h4 className="font-medium">{category.name}</h4>
-                            <div className="text-xs text-muted-foreground">
-                              {formatCurrency(category.spent)} de {formatCurrency(category.budget)}
-                            </div>
-                          </div>
+            <div className="space-y-8">
+              {budget.categories.map((category) => {
+                const percentage = Math.round((category.spent / category.budget) * 100);
+                
+                return (
+                  <div key={category.id}>
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center">
+                        <div className={`p-1.5 rounded-full mr-2 ${
+                          percentage > 100 
+                            ? 'bg-destructive/10 text-destructive' 
+                            : percentage > 80 
+                              ? 'bg-secondary/10 text-secondary' 
+                              : 'bg-primary/10 text-primary'
+                        }`}>
+                          {getCategoryIcon(category.name)}
                         </div>
-                        <div className="text-sm font-medium">
-                          {percentage}%
+                        <div>
+                          <h4 className="font-medium">{category.name}</h4>
+                          <div className="text-xs text-muted-foreground">
+                            {formatCurrency(category.spent)} de {formatCurrency(category.budget)}
+                          </div>
                         </div>
                       </div>
-                      <Progress 
-                        value={percentage > 100 ? 100 : percentage} 
-                        className="h-2" 
-                        indicatorClassName={getColorClass(percentage)}
-                      />
+                      <div className="text-sm font-medium">
+                        {percentage}%
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
-            </TabsContent>
+                    <Progress 
+                      value={percentage > 100 ? 100 : percentage} 
+                      className="h-2" 
+                      indicatorClassName={getColorClass(percentage)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </CardContent>
         </Card>
         
