@@ -9,46 +9,57 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-// Dados mockados para demonstração
+// Dados mockados para demonstração - com sugestões mais específicas
 const mockSuggestions = [
   {
     id: 1,
-    title: "Economize em alimentação",
-    description: "Você gastou R$ 223,50 a mais em alimentação este mês comparado ao anterior. Considere preparar mais refeições em casa ou utilizar cupons de desconto.",
-    type: "saving",
-    confidence: 0.92,
-    category: "Alimentação",
-    potentialSavings: 200.0,
-    icon: <DollarSign className="h-5 w-5 text-green-500" />
-  },
-  {
-    id: 2,
-    title: "Alerta de gasto excessivo",
-    description: "Seus gastos com entretenimento estão 35% acima do orçamento estabelecido. Considere reduzir despesas não essenciais nesta categoria.",
+    title: "Aumento em gastos com fastfood",
+    description: "Identificamos um aumento de 37% (R$ 287,35) em gastos com fastfood no último mês. Os estabelecimentos mais frequentes foram Burger King (7x) e McDonald's (5x). Substituir 5 refeições por opções caseiras poderia economizar aproximadamente R$ 180,00.",
     type: "alert",
-    confidence: 0.85,
-    category: "Entretenimento",
-    potentialSavings: 150.0,
+    confidence: 0.94,
+    category: "Alimentação",
+    potentialSavings: 180.0,
     icon: <PieChart className="h-5 w-5 text-amber-500" />
   },
   {
+    id: 2,
+    title: "Assinaturas não utilizadas",
+    description: "Você mantém 3 assinaturas de streaming que tiveram menos de 2 horas de uso no último mês: Netflix (R$ 39,90), Disney+ (R$ 33,90) e Paramount+ (R$ 19,90). Cancelar ou pausar as menos utilizadas economizaria R$ 53,80/mês.",
+    type: "saving",
+    confidence: 0.91,
+    category: "Entretenimento",
+    potentialSavings: 53.80,
+    icon: <DollarSign className="h-5 w-5 text-green-500" />
+  },
+  {
     id: 3,
-    title: "Oportunidade de investimento",
-    description: "Com base no seu padrão de economia, você poderia investir R$ 250,00 por mês em uma carteira diversificada. Isso poderia gerar aproximadamente R$ 33.000 em 10 anos.",
+    title: "Oportunidade de investimento com dividendos",
+    description: "Seu padrão de gastos mostra uma disponibilidade média de R$ 320,00/mês para investimentos. Direcionando este valor para ETFs de dividendos como IVVB11, você poderia receber aproximadamente R$ 92,00 trimestrais em rendimentos passivos já no primeiro ano.",
     type: "investment",
-    confidence: 0.78,
+    confidence: 0.85,
     category: "Investimentos",
-    potentialReturn: 33000,
+    potentialReturn: 368.00,
     icon: <TrendingUp className="h-5 w-5 text-blue-500" />
   },
   {
     id: 4,
-    title: "Sugestão de orçamento",
-    description: "Recomendamos alocar 50% da sua renda para necessidades, 30% para desejos e 20% para economias e investimentos. No momento, você está alocando apenas 5% para economias.",
-    type: "budget",
-    confidence: 0.88,
-    category: "Orçamento",
+    title: "Aumento em tarifas bancárias",
+    description: "Você pagou R$ 68,90 em tarifas bancárias no último mês, um aumento de 120% em relação à média dos 3 meses anteriores. Verificamos que bancos digitais como Nubank e Inter ofereceriam serviços similares sem estas taxas.",
+    type: "alert",
+    confidence: 0.97,
+    category: "Finanças",
+    potentialSavings: 68.90,
     icon: <Sparkles className="h-5 w-5 text-violet-500" />
+  },
+  {
+    id: 5,
+    title: "Economia em transporte",
+    description: "Seus dados de localização mostram que você utilizou carros de aplicativo para 12 trajetos curtos (< 3km) no último mês, gastando R$ 176,40. Usando transporte público ou micromobilidade nestes trajetos, a economia estimada seria de R$ 124,80.",
+    type: "saving",
+    confidence: 0.88,
+    category: "Transporte",
+    potentialSavings: 124.80,
+    icon: <DollarSign className="h-5 w-5 text-green-500" />
   }
 ];
 

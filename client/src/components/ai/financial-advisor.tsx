@@ -14,28 +14,28 @@ import { Skeleton } from "@/components/ui/skeleton";
 const mockSuggestions = [
   {
     id: 1,
-    text: "Como posso economizar dinheiro em alimentação?",
+    text: "Como posso reduzir meus gastos em fastfood que aumentaram 37% no último mês?",
     category: "economia"
   },
   {
     id: 2,
-    text: "Qual a melhor forma de começar a investir com pouco dinheiro?",
-    category: "investimentos"
+    text: "Vale a pena manter minhas 3 assinaturas de streaming se uso menos de 2h por mês?",
+    category: "despesas"
   },
   {
     id: 3,
-    text: "Como organizar meu orçamento mensal?",
-    category: "orçamento"
+    text: "Como investir meus R$ 320,00 mensais disponíveis em ETFs de dividendos?",
+    category: "investimentos"
   },
   {
     id: 4,
-    text: "Dicas para reduzir gastos com entretenimento",
-    category: "economia"
+    text: "Quais bancos digitais oferecem contas sem tarifas para substituir meu banco atual?",
+    category: "finanças"
   },
   {
     id: 5,
-    text: "O que é reserva de emergência e como criar uma?",
-    category: "planejamento"
+    text: "Como economizar nos trajetos curtos que faço 12x por mês usando carros de aplicativo?",
+    category: "transporte"
   }
 ];
 
@@ -114,16 +114,18 @@ export function FinancialAdvisor() {
   const getMockResponse = (input: string): string => {
     const inputLower = input.toLowerCase();
     
-    if (inputLower.includes("economi") || inputLower.includes("gast")) {
-      return "Para economizar dinheiro, considere criar um orçamento detalhado, reduzir gastos supérfluos como assinaturas não utilizadas, e usar aplicativos de cashback para compras essenciais. Baseado nos seus dados de gastos, você poderia economizar cerca de R$ 320,00 por mês reduzindo despesas em alimentação e entretenimento.";
-    } else if (inputLower.includes("invest")) {
-      return "Para começar a investir com pouco dinheiro, recomendo considerar primeiro sua reserva de emergência. Depois disso, ETFs e fundos de índice são boas opções para iniciantes, pois oferecem diversificação a baixo custo. Com os dados do seu perfil, você poderia começar investindo R$ 200,00 mensalmente e aumentar gradualmente com o tempo.";
-    } else if (inputLower.includes("orçamento") || inputLower.includes("planej")) {
-      return "Para organizar seu orçamento mensal, use a regra 50-30-20: 50% para necessidades básicas, 30% para desejos, e 20% para poupança e investimentos. Analisando suas transações, vejo que atualmente você está gastando 70% com necessidades, 25% com desejos e apenas 5% está indo para poupança. Considere rever seus gastos com alimentação fora e assinaturas para aumentar sua taxa de poupança.";
-    } else if (inputLower.includes("dívida") || inputLower.includes("empréstimo")) {
-      return "Para lidar com dívidas, primeiro priorize-as por taxa de juros. Concentre-se em pagar as de taxas mais altas primeiro, enquanto faz o pagamento mínimo nas demais. Métodos como a bola de neve (snowball) ou a avalanche de dívidas podem ser eficazes, dependendo da sua situação. Baseado no seu histórico financeiro, recomendo dedicar R$ 500 mensais para quitação de dívidas.";
+    if (inputLower.includes("fastfood") || inputLower.includes("37%")) {
+      return "Analisei seus gastos com fastfood nos últimos 3 meses e identifiquei um padrão: você costuma pedir delivery nos dias de semana entre 18h e 20h, especialmente às terças e quintas. Sugestões específicas para reduzir esses gastos:\n\n1. Prepare marmitas nos fins de semana para esses 2 dias específicos (economia de R$ 154/mês)\n2. Utilize os cupons 'primeira compra' em novos apps (encontrei 3 disponíveis para você: iFood, Rappi e UberEats, economia de até R$ 95)\n3. Inscreva-se nos programas de fidelidade do Burger King e McDonald's, onde você gasta R$ 287,35/mês (potencial economia de 15-20%)";
+    } else if (inputLower.includes("streaming") || inputLower.includes("assinatura")) {
+      return "Analisei suas assinaturas e seu histórico de uso:\n\n• Netflix (R$ 39,90): Apenas 1h20min de uso em abril, assistindo principalmente à série 'Bridgerton'\n• Disney+ (R$ 33,90): 40min de uso em abril, nenhum título específico assistido por mais de 15min\n• Paramount+ (R$ 19,90): Sem uso detectado nos últimos 67 dias\n\nRecomendações:\n1. Cancele o Paramount+ imediatamente (economia de R$ 19,90/mês)\n2. Pause o Disney+ e reative quando lançarem conteúdo do seu interesse (você segue Marvel e Star Wars)\n3. Considere o plano compartilhado da Netflix com familiares (economia de R$ 23,90/mês)";
+    } else if (inputLower.includes("etf") || inputLower.includes("divid")) {
+      return "Com base na sua disponibilidade de R$ 320/mês e seu perfil moderado de risco, recomendo a seguinte alocação em ETFs de dividendos:\n\n• 40% em IVVB11 (S&P 500): Rendimento anual médio de 1,9% em dividendos + valorização histórica\n• 30% em DIVO11 (Ações de Dividendos Brasil): Yield médio de 7,4% ao ano\n• 30% em XPCM11 (Fundos Imobiliários): Distribuição mensal com yield médio de 8,2% ao ano\n\nCom esta carteira, você teria um potencial de R$ 92,00 trimestrais em rendimentos passivos já no primeiro ano, com perspectiva de crescimento do principal investido.\n\nPosso detalhar como abrir uma conta em corretoras sem taxa como Clear, Rico ou Nu Invest para iniciar estes investimentos.";
+    } else if (inputLower.includes("banco") || inputLower.includes("tarifa")) {
+      return "Analisando seu extrato bancário do Banco XYZ, identifiquei R$ 68,90 em tarifas mensais:\n\n• Tarifa de manutenção de conta: R$ 35,00\n• Tarifa de cartão de crédito: R$ 27,00\n• Tarifas por transferências: R$ 6,90\n\nRecomendo migrar para um dos seguintes bancos digitais que oferecem serviços similares sem estas taxas:\n\n1. Nubank: Conta e cartão de crédito sem anuidade, TEDs e Pix gratuitos\n2. Inter: Pacote completo com investimentos integrados\n3. PicPay: Facilidades de pagamento e cashback em compras\n\nPosso ajudar com um passo-a-passo para fazer a portabilidade, garantindo que seus débitos automáticos e recebimentos continuem funcionando durante a transição.";
+    } else if (inputLower.includes("transporte") || inputLower.includes("aplicativo")) {
+      return "Analisei seus 12 trajetos mensais com carros de aplicativo que custaram R$ 176,40 no total:\n\n• 8 trajetos são de casa para a academia (2,1km)\n• 4 trajetos são do trabalho para reuniões próximas (1,8km)\n\nAlternativas mais econômicas:\n\n1. Bicicletas/patinetes compartilhados: Disponíveis em sua região por R$ 8,00/trajeto (economia de R$ 96,40/mês)\n2. Transporte público: Linhas 302 e 415 atendem seus trajetos frequentes (economia de R$ 124,80/mês)\n3. Caminhada: Para os trajetos de 1,8km (25min a pé), representando benefício para saúde e economia de R$ 58,80/mês\n\nExiste também a opção de pacotes de desconto nos apps de transporte: O Uber Pass (R$ 24,99/mês) ofereceria 10% de desconto nestes trajetos específicos.";
     } else {
-      return "Obrigado pela sua pergunta. Com base na análise dos seus dados financeiros, posso ver que você tem se saído bem em manter seus gastos sob controle. Continuar monitorando suas despesas e estabelecer metas financeiras específicas pode ajudá-lo a melhorar ainda mais sua saúde financeira. Há algo específico sobre finanças pessoais que você gostaria de saber mais?";
+      return "Analisei seu perfil financeiro completo e identifiquei três oportunidades principais para otimização:\n\n1. Redução de gastos variáveis: Suas despesas com delivery (R$ 287,35) e assinaturas pouco utilizadas (R$ 93,70) representam 19% do seu orçamento mensal\n\n2. Oportunidade de investimento: Com a economia potencial de R$ 320/mês, você poderia construir inicialmente sua reserva de emergência (atualmente em 1,2 mês de despesas, ideal seriam 6 meses) e depois direcionar para investimentos em renda variável conforme seu perfil moderado\n\n3. Otimização bancária: A migração para bancos digitais eliminaria R$ 68,90 em tarifas mensais\n\nGostaria que eu detalhasse alguma dessas oportunidades específicas?";
     }
   };
 
