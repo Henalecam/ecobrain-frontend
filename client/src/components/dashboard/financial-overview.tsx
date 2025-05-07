@@ -1,14 +1,24 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Wallet, 
-  PiggyBank,
-  ArrowUp,
-  Calendar
-} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown, Wallet, PiggyBank, CreditCard, LineChart } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// Mock data for financial overview
+const mockData = {
+  totalBalance: 12580.45,
+  monthlyIncome: 8350.00,
+  monthlyExpenses: 4230.75,
+  savings: 4120.25,
+  investments: 25000.00,
+  debts: 15000.00,
+  trends: {
+    balance: 5.2,
+    income: 3.8,
+    expenses: -2.1,
+    savings: 8.5
+  }
+};
 
 // Format currency for display
 const formatCurrency = (amount: number) => {
@@ -18,24 +28,85 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
+// Format percentage for display
+const formatPercentage = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1
+  }).format(value / 100);
+};
+
+interface MetricCardProps {
+  title: string;
+  value: string;
+  trend?: number;
+  icon: React.ReactNode;
+  description?: string;
+}
+
+function MetricCard({ title, value, trend, icon, description }: MetricCardProps) {
+  const isPositive = trend && trend > 0;
+  const isNegative = trend && trend < 0;
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
+        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+          {icon}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        {trend !== undefined && (
+          <div className="flex items-center gap-1 mt-1">
+            {isPositive ? (
+              <ArrowUpRight className="h-4 w-4 text-green-600" />
+            ) : isNegative ? (
+              <ArrowDownRight className="h-4 w-4 text-red-600" />
+            ) : null}
+            <span className={cn(
+              "text-sm",
+              isPositive && "text-green-600",
+              isNegative && "text-red-600"
+            )}>
+              {formatPercentage(Math.abs(trend))}
+            </span>
+            <span className="text-sm text-muted-foreground">vs. mês anterior</span>
+          </div>
+        )}
+        {description && (
+          <p className="text-sm text-muted-foreground mt-1">{description}</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export function FinancialOverview() {
-  const { data: financialData, isLoading } = useQuery({
-    queryKey: ['/api/dashboard/overview'],
-    staleTime: 5 * 60 * 1000, // 5 minutes
+  const { data, isLoading } = useQuery({
+    queryKey: ['/api/financial/overview'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return mockData;
+    }
   });
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
           <Card key={i}>
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-5 w-5 rounded-full" />
-              </div>
-              <Skeleton className="h-7 w-32 mb-2" />
-              <Skeleton className="h-4 w-full" />
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <Skeleton className="h-4 w-[100px]" />
+              <Skeleton className="h-8 w-8 rounded-full" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-[120px] mb-2" />
+              <Skeleton className="h-4 w-[80px]" />
             </CardContent>
           </Card>
         ))}
@@ -43,87 +114,36 @@ export function FinancialOverview() {
     );
   }
 
-  const {
-    currentBalance = 5742.89,
-    monthlyIncome = 8350.00,
-    monthlyExpenses = 4127.35,
-    monthlySavings = 4222.65,
-    balanceChange = 8.2,
-    lastIncomeDate = "26/04/2023",
-    budgetPercentage = 65,
-    savingsChange = 12.5
-  } = financialData || {};
-
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      {/* Balance Card */}
-      <Card>
-        <CardContent className="p-4 flex flex-col">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-muted-foreground text-sm">Saldo Atual</h3>
-            <Wallet className="text-primary h-5 w-5" />
-          </div>
-          <p className="text-2xl font-mono font-medium">{formatCurrency(currentBalance)}</p>
-          <div className="mt-2 flex items-center text-xs">
-            <span className="text-primary bg-primary bg-opacity-10 px-2 py-1 rounded flex items-center">
-              <ArrowUp className="mr-1 h-3 w-3" />{balanceChange}%
-            </span>
-            <span className="ml-2 text-muted-foreground">vs. mês passado</span>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Income Card */}
-      <Card>
-        <CardContent className="p-4 flex flex-col">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-muted-foreground text-sm">Receitas (Mês)</h3>
-            <TrendingUp className="text-secondary h-5 w-5" />
-          </div>
-          <p className="text-2xl font-mono font-medium text-secondary">{formatCurrency(monthlyIncome)}</p>
-          <div className="mt-auto text-xs flex items-center">
-            <Calendar className="text-secondary mr-1 h-3 w-3" />
-            <span className="text-muted-foreground">Último: {lastIncomeDate}</span>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Expenses Card */}
-      <Card>
-        <CardContent className="p-4 flex flex-col">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-muted-foreground text-sm">Despesas (Mês)</h3>
-            <TrendingDown className="text-destructive h-5 w-5" />
-          </div>
-          <p className="text-2xl font-mono font-medium text-destructive">{formatCurrency(monthlyExpenses)}</p>
-          <div className="mt-auto text-xs flex items-center w-full">
-            <div className="w-full bg-muted rounded-full h-1.5">
-              <div 
-                className="bg-destructive h-1.5 rounded-full" 
-                style={{ width: `${budgetPercentage}%` }}
-              ></div>
-            </div>
-            <span className="ml-2 whitespace-nowrap text-muted-foreground">{budgetPercentage}% do orçamento</span>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Savings Card */}
-      <Card>
-        <CardContent className="p-4 flex flex-col">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-muted-foreground text-sm">Economia (Mês)</h3>
-            <PiggyBank className="text-success h-5 w-5" />
-          </div>
-          <p className="text-2xl font-mono font-medium text-primary">{formatCurrency(monthlySavings)}</p>
-          <div className="mt-auto text-xs flex items-center">
-            <span className="text-primary bg-primary bg-opacity-10 px-2 py-1 rounded flex items-center">
-              <ArrowUp className="mr-1 h-3 w-3" />{savingsChange}%
-            </span>
-            <span className="ml-2 text-muted-foreground">vs. meta mensal</span>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <MetricCard
+        title="Saldo Total"
+        value={formatCurrency(data?.totalBalance || 0)}
+        trend={data?.trends.balance}
+        icon={<Wallet className="h-4 w-4 text-primary" />}
+        description="Inclui todas as contas"
+      />
+      <MetricCard
+        title="Receitas Mensais"
+        value={formatCurrency(data?.monthlyIncome || 0)}
+        trend={data?.trends.income}
+        icon={<TrendingUp className="h-4 w-4 text-green-600" />}
+        description="Últimos 30 dias"
+      />
+      <MetricCard
+        title="Despesas Mensais"
+        value={formatCurrency(data?.monthlyExpenses || 0)}
+        trend={data?.trends.expenses}
+        icon={<TrendingDown className="h-4 w-4 text-red-600" />}
+        description="Últimos 30 dias"
+      />
+      <MetricCard
+        title="Economias"
+        value={formatCurrency(data?.savings || 0)}
+        trend={data?.trends.savings}
+        icon={<PiggyBank className="h-4 w-4 text-blue-600" />}
+        description="Total acumulado"
+      />
     </div>
   );
 }

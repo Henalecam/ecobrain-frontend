@@ -1,15 +1,15 @@
-import { Link, useLocation } from "wouter";
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, ReceiptText, BarChart, User, Plus, Lightbulb } from "lucide-react";
 
 export function MobileNav() {
-  const [location] = useLocation();
+  const location = useLocation();
 
   const navItems = [
-    { href: "/", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
-    { href: "/transactions", label: "Transações", icon: <ReceiptText className="h-5 w-5" /> },
-    { href: "/insights", label: "Insights", icon: <Lightbulb className="h-5 w-5" /> },
-    { href: "/reports", label: "Relatórios", icon: <BarChart className="h-5 w-5" /> },
+    { to: "/", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { to: "/transactions", label: "Transações", icon: <ReceiptText className="h-5 w-5" /> },
+    { to: "/insights", label: "Insights", icon: <Lightbulb className="h-5 w-5" /> },
+    { to: "/reports", label: "Relatórios", icon: <BarChart className="h-5 w-5" /> },
   ];
 
   return (
@@ -21,7 +21,7 @@ export function MobileNav() {
             <>
               <Link
                 key="add-transaction"
-                href="/transactions/new"
+                to="/transactions/new"
                 className="flex flex-col items-center"
               >
                 <div className="bg-primary text-primary-foreground p-3 rounded-full -mt-8 shadow-md">
@@ -30,11 +30,11 @@ export function MobileNav() {
                 <span className="text-xs mt-1 invisible">Adicionar</span>
               </Link>
               <Link
-                key={item.href}
-                href={item.href}
+                key={item.to}
+                to={item.to}
                 className={cn(
                   "flex flex-col items-center",
-                  location === item.href
+                  location.pathname === item.to
                     ? "text-primary"
                     : "text-muted-foreground"
                 )}
@@ -47,11 +47,11 @@ export function MobileNav() {
         }
         return (
           <Link
-            key={item.href}
-            href={item.href}
+            key={item.to}
+            to={item.to}
             className={cn(
               "flex flex-col items-center",
-              location === item.href
+              location.pathname === item.to
                 ? "text-primary"
                 : "text-muted-foreground"
             )}

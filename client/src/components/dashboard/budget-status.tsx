@@ -2,8 +2,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Home, Utensils, Car, Tv, HeartPulse } from "lucide-react";
-import { Link } from "wouter";
+import { Home, Utensils, Car, Tv, HeartPulse, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+
+interface BudgetCategory {
+  id: number;
+  name: string;
+  spent: number;
+  budget: number;
+  icon: string;
+}
 
 // Format currency for display
 const formatCurrency = (amount: number) => {
@@ -39,18 +48,20 @@ const getCategoryIcon = (category: string) => {
 };
 
 export function BudgetStatus() {
-  const { data: budgetCategories, isLoading } = useQuery({
+  const navigate = useNavigate();
+  const { data: budgetCategories, isLoading } = useQuery<BudgetCategory[]>({
     queryKey: ['/api/budget/categories'],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return [
+        { id: 1, name: 'Alimentação', spent: 854.36, budget: 1200.00, icon: 'food' },
+        { id: 2, name: 'Moradia', spent: 1350.00, budget: 1500.00, icon: 'home' },
+        { id: 3, name: 'Transporte', spent: 478.52, budget: 600.00, icon: 'car' },
+        { id: 4, name: 'Entretenimento', spent: 423.47, budget: 400.00, icon: 'tv' },
+        { id: 5, name: 'Saúde', spent: 285.00, budget: 800.00, icon: 'health' },
+      ];
+    }
   });
-
-  // Sample data structure, but we'll use API data when available
-  const categories = budgetCategories || [
-    { id: 1, name: 'Alimentação', spent: 854.36, budget: 1200.00, icon: 'food' },
-    { id: 2, name: 'Moradia', spent: 1350.00, budget: 1500.00, icon: 'home' },
-    { id: 3, name: 'Transporte', spent: 478.52, budget: 600.00, icon: 'car' },
-    { id: 4, name: 'Entretenimento', spent: 423.47, budget: 400.00, icon: 'tv' },
-    { id: 5, name: 'Saúde', spent: 285.00, budget: 800.00, icon: 'health' },
-  ];
 
   if (isLoading) {
     return (
@@ -75,15 +86,16 @@ export function BudgetStatus() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle>Orçamento Mensal</CardTitle>
-        <Link href="/budget" className="text-sm text-primary hover:underline flex items-center">
+        <button
+          onClick={() => navigate('/budget')}
+          className="text-sm text-primary hover:underline flex items-center"
+        >
           <span>Ver todos</span>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-          </svg>
-        </Link>
+          <ChevronRight className="h-4 w-4 ml-1" />
+        </button>
       </CardHeader>
       <CardContent className="space-y-4">
-        {categories.map((category) => {
+        {budgetCategories?.map((category) => {
           const percentage = Math.round((category.spent / category.budget) * 100);
           
           return (
@@ -103,8 +115,7 @@ export function BudgetStatus() {
               </div>
               <Progress 
                 value={percentage > 100 ? 100 : percentage} 
-                className="h-2" 
-                indicatorClassName={getColorForPercentage(percentage)}
+                className={cn("h-2", getColorForPercentage(percentage))}
               />
             </div>
           );

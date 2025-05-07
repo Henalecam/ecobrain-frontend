@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,7 +29,7 @@ type TopNavProps = {
 };
 
 export function TopNav({ onMenuClick }: TopNavProps) {
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const { user, logoutMutation } = useAuth();
   const { theme, setTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
@@ -62,7 +62,7 @@ export function TopNav({ onMenuClick }: TopNavProps) {
             <Menu className="h-5 w-5" />
           </button>
           <Link 
-            href="/"
+            to="/"
             className="font-heading font-bold text-xl text-primary ml-3 flex items-center"
           >
             <Leaf className="mr-1 h-5 w-5" />

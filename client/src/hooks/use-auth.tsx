@@ -1,50 +1,85 @@
-import { createContext, ReactNode, useContext } from "react";
-import {
-  useQuery,
-  useMutation,
-  UseMutationResult,
-} from "@tanstack/react-query";
-import { InsertUser, User } from "@shared/schema";
-import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
+import { createContext, ReactNode, useContext, useState, useEffect } from "react";
+import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
+// Conta mockada estática
+const STATIC_USER = {
+  id: 1,
+  username: "usuario.demo",
+  firstName: "Usuário",
+  lastName: "Demo",
+  email: "demo@ecobrain.com",
+};
+
+type User = typeof STATIC_USER;
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   error: Error | null;
   loginMutation: UseMutationResult<User, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
-  registerMutation: UseMutationResult<User, Error, InsertUser>;
+  registerMutation: UseMutationResult<User, Error, RegisterData>;
 };
 
-type LoginData = Pick<InsertUser, "username" | "password">;
+type LoginData = { username: string; password: string };
+type RegisterData = { username: string; password: string; email: string };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
-  const {
-    data: user,
-    error,
-    isLoading,
-  } = useQuery<User | null>({
-    queryKey: ["/api/user"],
-    queryFn: getQueryFn({ on401: "returnNull" }),
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // Começa como true para carregar o estado inicial
 
-  const loginMutation = useMutation({
-    mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest("POST", "/api/login", credentials);
-      return await res.json();
+  // Carrega o estado inicial do usuário
+  useEffect(() => {
+    const loadInitialState = async () => {
+      try {
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar estado do usuário:', error);
+        localStorage.removeItem('user');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadInitialState();
+  }, []);
+
+  // Atualiza o localStorage quando o usuário muda
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  }, [user]);
+
+  const loginMutation = useMutation<User, Error, LoginData>({
+    mutationFn: async (_credentials) => {
+      setIsLoading(true);
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return STATIC_USER;
+      } finally {
+        setIsLoading(false);
+      }
     },
-    onSuccess: (user: User) => {
-      queryClient.setQueryData(["/api/user"], user);
+    onSuccess: (user) => {
+      setUser(user);
+      setError(null);
       toast({
         title: "Login bem-sucedido",
         description: `Bem-vindo de volta, ${user.firstName || user.username}!`,
       });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
+      setError(error);
       toast({
         title: "Falha no login",
         description: error.message || "Credenciais inválidas. Tente novamente.",
@@ -53,19 +88,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const registerMutation = useMutation({
-    mutationFn: async (userData: InsertUser) => {
-      const res = await apiRequest("POST", "/api/register", userData);
-      return await res.json();
+  const registerMutation = useMutation<User, Error, RegisterData>({
+    mutationFn: async (_userData) => {
+      setIsLoading(true);
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return STATIC_USER;
+      } finally {
+        setIsLoading(false);
+      }
     },
-    onSuccess: (user: User) => {
-      queryClient.setQueryData(["/api/user"], user);
+    onSuccess: (user) => {
+      setUser(user);
+      setError(null);
       toast({
         title: "Registro bem-sucedido",
         description: `Bem-vindo ao EcoBrain, ${user.firstName || user.username}!`,
       });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
+      setError(error);
       toast({
         title: "Falha no registro",
         description: error.message || "Não foi possível criar sua conta. Tente novamente.",
@@ -74,18 +116,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const logoutMutation = useMutation({
+  const logoutMutation = useMutation<void, Error, void>({
     mutationFn: async () => {
-      await apiRequest("POST", "/api/logout");
+      setIsLoading(true);
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      } finally {
+        setIsLoading(false);
+      }
     },
     onSuccess: () => {
-      queryClient.setQueryData(["/api/user"], null);
+      setUser(null);
+      setError(null);
       toast({
         title: "Logout realizado com sucesso",
         description: "Você foi desconectado da sua conta.",
       });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
+      setError(error);
       toast({
         title: "Falha no logout",
         description: error.message,
@@ -97,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        user: user || null,
+        user,
         isLoading,
         error,
         loginMutation,

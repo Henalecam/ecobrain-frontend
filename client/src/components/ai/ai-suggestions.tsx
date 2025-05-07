@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Lightbulb, TrendingUp, DollarSign, Sparkles, RefreshCcw, PieChart } from "lucide-react";
+import { Lightbulb, TrendingUp, DollarSign, Sparkles, RefreshCcw, PieChart, MessageSquare, Send, ThumbsUp, ThumbsDown, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,9 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 // Dados mockados para demonstração - com sugestões mais específicas
 const mockSuggestions = [
@@ -98,25 +101,38 @@ function getBadgeText(type: string) {
 export function AISuggestions() {
   const [isEnabled, setIsEnabled] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [userMessage, setUserMessage] = useState("");
+  const [expandedSuggestion, setExpandedSuggestion] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<Record<number, 'up' | 'down' | null>>({});
 
   // Mock da chamada de API para sugestões
   const { data: suggestions, isLoading } = useQuery({
     queryKey: ['/api/ai/suggestions'],
     enabled: isEnabled,
-    // Para simular uma API real, usamos um setTimeout
     queryFn: async () => {
-      // Simulando um atraso de rede
       await new Promise(resolve => setTimeout(resolve, 1500));
       return mockSuggestions;
     }
   });
 
-  // Função para simular o refresh das sugestões
   const refreshSuggestions = () => {
     setIsRefreshing(true);
     setTimeout(() => {
       setIsRefreshing(false);
     }, 2000);
+  };
+
+  const handleSendMessage = () => {
+    if (!userMessage.trim()) return;
+    // TODO: Implement message sending
+    setUserMessage("");
+  };
+
+  const handleFeedback = (suggestionId: number, type: 'up' | 'down') => {
+    setFeedback(prev => ({
+      ...prev,
+      [suggestionId]: prev[suggestionId] === type ? null : type
+    }));
   };
 
   if (!isEnabled) {
@@ -142,7 +158,7 @@ export function AISuggestions() {
   }
 
   return (
-    <Card>
+    <Card className="flex flex-col h-full">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center gap-2">
@@ -179,46 +195,121 @@ export function AISuggestions() {
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="flex flex-col gap-4">
-        {isLoading ? (
-          <>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-1/3" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-2/3" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-1/3" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-2/3" />
-            </div>
-          </>
-        ) : suggestions?.length ? (
-          suggestions.map((suggestion) => (
-            <div key={suggestion.id} className="border rounded-lg p-4 transition-all hover:border-primary hover:bg-accent">
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2">
-                  {suggestion.icon}
-                  <h4 className="font-medium">{suggestion.title}</h4>
+      <CardContent className="flex-1 flex flex-col gap-4">
+        <ScrollArea className="flex-1 pr-4">
+          {isLoading ? (
+            <>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+            </>
+          ) : suggestions?.length ? (
+            <div className="space-y-4">
+              {suggestions.map((suggestion) => (
+                <div 
+                  key={suggestion.id} 
+                  className={cn(
+                    "border rounded-lg p-4 transition-all",
+                    expandedSuggestion === suggestion.id 
+                      ? "border-primary bg-accent" 
+                      : "hover:border-primary hover:bg-accent"
+                  )}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-2">
+                      {suggestion.icon}
+                      <h4 className="font-medium">{suggestion.title}</h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={getBadgeVariant(suggestion.type) as any}>
+                        {getBadgeText(suggestion.type)}
+                      </Badge>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => setExpandedSuggestion(
+                          expandedSuggestion === suggestion.id ? null : suggestion.id
+                        )}
+                      >
+                        {expandedSuggestion === suggestion.id ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className={cn(
+                    "space-y-2 transition-all",
+                    expandedSuggestion === suggestion.id ? "block" : "hidden"
+                  )}>
+                    <p className="text-sm text-muted-foreground">{suggestion.description}</p>
+                    <div className="flex justify-between items-center text-xs text-muted-foreground">
+                      <span>Categoria: {suggestion.category}</span>
+                      <span>Confiança: {Math.round(suggestion.confidence * 100)}%</span>
+                    </div>
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "h-8 px-2",
+                          feedback[suggestion.id] === 'up' && "text-green-500"
+                        )}
+                        onClick={() => handleFeedback(suggestion.id, 'up')}
+                      >
+                        <ThumbsUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "h-8 px-2",
+                          feedback[suggestion.id] === 'down' && "text-red-500"
+                        )}
+                        onClick={() => handleFeedback(suggestion.id, 'down')}
+                      >
+                        <ThumbsDown className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <Badge variant={getBadgeVariant(suggestion.type) as any}>
-                  {getBadgeText(suggestion.type)}
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground mb-2">{suggestion.description}</p>
-              <div className="flex justify-between items-center text-xs text-muted-foreground">
-                <span>Categoria: {suggestion.category}</span>
-                <span>Confiança: {Math.round(suggestion.confidence * 100)}%</span>
-              </div>
+              ))}
             </div>
-          ))
-        ) : (
-          <div className="text-center py-6">
-            <p className="text-muted-foreground">Nenhuma sugestão disponível no momento.</p>
-          </div>
-        )}
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-muted-foreground">Nenhuma sugestão disponível no momento.</p>
+            </div>
+          )}
+        </ScrollArea>
+
+        <div className="flex gap-2 pt-4 border-t">
+          <Textarea
+            placeholder="Pergunte algo sobre suas finanças..."
+            value={userMessage}
+            onChange={(e) => setUserMessage(e.target.value)}
+            className="min-h-[60px]"
+          />
+          <Button
+            size="icon"
+            className="self-end"
+            onClick={handleSendMessage}
+            disabled={!userMessage.trim()}
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
       </CardContent>
       
       <CardFooter className="flex justify-between border-t pt-4 text-xs text-muted-foreground">
