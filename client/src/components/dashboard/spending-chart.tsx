@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
@@ -12,31 +11,33 @@ import { cn } from "@/lib/utils";
 // Mock data for spending chart
 const mockData = {
   daily: [
-    { date: "01/03", amount: 150.00 },
+    { date: "01/03", amount: 450.00 },
     { date: "02/03", amount: 230.50 },
-    { date: "03/03", amount: 180.75 },
+    { date: "03/03", amount: 580.75 },
     { date: "04/03", amount: 320.25 },
-    { date: "05/03", amount: 275.00 },
-    { date: "06/03", amount: 190.50 },
-    { date: "07/03", amount: 210.75 }
+    { date: "05/03", amount: 475.00 },
+    { date: "06/03", amount: 290.50 },
+    { date: "07/03", amount: 410.75 }
   ],
   weekly: [
-    { week: "Sem 1", amount: 1250.00 },
-    { week: "Sem 2", amount: 980.50 },
-    { week: "Sem 3", amount: 1150.75 },
-    { week: "Sem 4", amount: 890.25 }
+    { week: "Sem 1", amount: 3250.00 },
+    { week: "Sem 2", amount: 2980.50 },
+    { week: "Sem 3", amount: 3150.75 },
+    { week: "Sem 4", amount: 2890.25 }
   ],
   monthly: [
-    { month: "Jan", amount: 4850.00 },
-    { month: "Fev", amount: 5200.50 },
-    { month: "Mar", amount: 4950.75 }
+    { month: "Jan", amount: 12850.00 },
+    { month: "Fev", amount: 13200.50 },
+    { month: "Mar", amount: 12950.75 }
   ],
   byCategory: [
-    { name: "Alimentação", value: 35, color: "#ef4444" },
-    { name: "Moradia", value: 25, color: "#3b82f6" },
-    { name: "Transporte", value: 15, color: "#22c55e" },
-    { name: "Entretenimento", value: 10, color: "#f59e0b" },
-    { name: "Outros", value: 15, color: "#8b5cf6" }
+    { name: "Alimentação", value: 28, color: "#ef4444", amount: 3626.00 },
+    { name: "Moradia", value: 25, color: "#3b82f6", amount: 3237.50 },
+    { name: "Transporte", value: 15, color: "#22c55e", amount: 1942.50 },
+    { name: "Saúde", value: 12, color: "#f59e0b", amount: 1554.00 },
+    { name: "Educação", value: 10, color: "#8b5cf6", amount: 1295.00 },
+    { name: "Entretenimento", value: 8, color: "#ec4899", amount: 1036.00 },
+    { name: "Outros", value: 2, color: "#6b7280", amount: 259.00 }
   ]
 };
 
@@ -60,17 +61,33 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
+const CategoryTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-background border rounded-lg shadow-lg p-3">
+        <p className="font-medium">{data.name}</p>
+        <p className="text-primary">{formatCurrency(data.amount)}</p>
+        <p className="text-sm text-muted-foreground">{data.value}% do total</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function SpendingChart() {
   const [timeRange, setTimeRange] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  const [view, setView] = useState<'chart' | 'categories'>('chart');
 
-  const { data, isLoading } = useQuery({
+  const { data = mockData, isLoading } = useQuery({
     queryKey: ['/api/spending/chart', timeRange],
     queryFn: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       return mockData;
-    }
+    },
+    initialData: mockData
   });
+
+  console.log('SpendingChart data:', data); // Debug dos dados
 
   if (isLoading) {
     return (
@@ -94,98 +111,43 @@ export function SpendingChart() {
             <CardTitle>Gastos</CardTitle>
             <CardDescription>Análise detalhada dos seus gastos</CardDescription>
           </div>
-          <div className="flex items-center gap-2">
-            <Select value={timeRange} onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setTimeRange(value)}>
-              <SelectTrigger className="w-[120px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">Diário</SelectItem>
-                <SelectItem value="weekly">Semanal</SelectItem>
-                <SelectItem value="monthly">Mensal</SelectItem>
-              </SelectContent>
-            </Select>
-            <Tabs value={view} onValueChange={(value) => setView(value as 'chart' | 'categories')}>
-              <TabsList>
-                <TabsTrigger value="chart">Gráfico</TabsTrigger>
-                <TabsTrigger value="categories">Categorias</TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
+          <Select value={timeRange} onValueChange={(value) => setTimeRange(value as any)}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="daily">Diário</SelectItem>
+              <SelectItem value="weekly">Semanal</SelectItem>
+              <SelectItem value="monthly">Mensal</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </CardHeader>
       <CardContent>
-        <TabsContent value="chart" className="mt-0">
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={data?.[timeRange]}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis
-                  dataKey={timeRange === 'daily' ? 'date' : timeRange === 'weekly' ? 'week' : 'month'}
-                  className="text-sm"
-                />
-                <YAxis
-                  tickFormatter={(value) => formatCurrency(value)}
-                  className="text-sm"
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar
-                  dataKey="amount"
-                  fill="hsl(var(--primary))"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </TabsContent>
-        <TabsContent value="categories" className="mt-0">
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={data?.byCategory}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {data?.byCategory.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="bg-background border rounded-lg shadow-lg p-3">
-                          <p className="font-medium">{payload[0].name}</p>
-                          <p className="text-primary">{payload[0].value}%</p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="flex flex-wrap justify-center gap-4 mt-4">
-              {data?.byCategory.map((category, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: category.color }}
-                  />
-                  <span className="text-sm">{category.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </TabsContent>
+        <div className="h-[300px] bg-neutral-900 rounded-lg flex items-center justify-center">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data?.[timeRange]}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis
+                dataKey={timeRange === 'daily' ? 'date' : timeRange === 'weekly' ? 'week' : 'month'}
+                className="text-sm"
+              />
+              <YAxis
+                tickFormatter={(value) => formatCurrency(value)}
+                className="text-sm"
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar
+                dataKey="amount"
+                fill="#fff"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );
